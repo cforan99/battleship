@@ -2,7 +2,7 @@
 # TO DO: Add turn count and end the game if turn limit is reached or if position is guessed correctly.
 # Make multiple battleships: you'll need to be careful because you need to make sure that you don’t place battleships on top of each other on the game board. You'll also want to make sure that you balance the size of the board with the number of ships so the game is still challenging and fun to play.
 # Make battleships of different sizes: this is trickier than it sounds. All the parts of the battleship need to be vertically or horizontally touching and you’ll need to make sure you don’t accidentally place part of a ship off the side of the board.
-# Make your game a two-player game.
+
 
 from random import randint
 
@@ -45,7 +45,9 @@ guess_col = None
 
 def get_guess(board):
     """Checks validity of guess from raw input and prints an error message, a hit, or a miss."""
-    guess = raw_input("Enter the letter-number coordinate of your shot location (e.g., D-4):")
+    guess = raw_input("Enter the letter-number coordinate of your shot location (e.g., D-4): ")
+
+    # Checks to see if raw input is valid.
     if guess == "":
         get_guess(board)
         return
@@ -54,24 +56,30 @@ def get_guess(board):
         get_guess(board)
         return
     
+    # Splits raw input into separate coordinates.
     guess_row_letter, guess_col = guess.split("-")
 
+    # Checks to see if raw input is valid.
     if not guess_col.isdigit() or not guess_row_letter.isalpha():
         print "Please type your coordinates as letter dash(-) number."
         get_guess(board)
         return
 
+    # Converts coordinates so that can be found in the dictionary.
     guess_row_letter = guess_row_letter.upper()
     guess_col = int(guess_col)
 
+    # Checks to see if guess is in range.
     if guess_row_letter not in ALPHABET or guess_col not in ALPHABET:
             print "Oops, that's not even in the ocean."
             get_guess(board)
             return
 
+    # Creates a corresponding row number from the row letter.
     guess_row_number = ALPHABET[guess_row_letter]
     print "Row", guess_row_letter
 
+    # Checks for a hit or a miss.
     if guess_row_number == ship_row and guess_col == ship_col:
         board[guess_row_number][guess_col] = 'X'
         print_board(board)
