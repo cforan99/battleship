@@ -35,25 +35,39 @@ print_board(board)
 def random_coordinates(board):
     return (randint(1, len(board)-1), randint(1, len(board)-1))
 
-ship_row, ship_col = random_coordinates(board)
+def place_ship(length):
+    ship_row, ship_col = random_coordinates(board)
+    print (ship_row, ship_col)
+    battleship = {(ship_row, ship_col)}
+    orientation = randint(0,1) #0 horizontal, 1 vertical
+    print orientation
+    for i in range(1, length):
+        if orientation == 0: #horizontal
+            if ship_col > 10-length:
+                battleship.add((ship_row, ship_col-i))
+            else:
+                battleship.add((ship_row, ship_col+i))
+        else:
+            if ship_row > 10-length:
+                battleship.add((ship_row-i, ship_col))
+            else:
+                battleship.add((ship_row+i, ship_col))
+    print battleship
+    return battleship
 
-print "Row", ship_row
-print "Col", ship_col
+battleship = place_ship(4)
 
-guess_row = None
-guess_col = None
-
-def get_guess(board):
+def get_guess(board, battleship):
     """Checks validity of guess from raw input and prints an error message, a hit, or a miss."""
     guess = raw_input("Enter the letter-number coordinate of your shot location (e.g., D-4): ")
 
     # Checks to see if raw input is valid.
     if guess == "":
-        get_guess(board)
+        get_guess(board, battleship)
         return
     elif "-" not in guess:
         print "Please type your coordinates as letter dash(-) number."
-        get_guess(board)
+        get_guess(board, battleship)
         return
     
     # Splits raw input into separate coordinates.
@@ -62,7 +76,7 @@ def get_guess(board):
     # Checks to see if raw input is valid.
     if not guess_col.isdigit() or not guess_row_letter.isalpha():
         print "Please type your coordinates as letter dash(-) number."
-        get_guess(board)
+        get_guess(board, battleship)
         return
 
     # Converts coordinates so that can be found in the dictionary.
@@ -72,7 +86,7 @@ def get_guess(board):
     # Checks to see if guess is in range.
     if guess_row_letter not in ALPHABET or guess_col not in ALPHABET:
             print "Oops, that's not even in the ocean."
-            get_guess(board)
+            get_guess(board, battleship)
             return
 
     # Creates a corresponding row number from the row letter.
@@ -80,18 +94,24 @@ def get_guess(board):
     print "Row", guess_row_letter
 
     # Checks for a hit or a miss.
-    if guess_row_number == ship_row and guess_col == ship_col:
+    if (guess_row_number, guess_col) in battleship:
         board[guess_row_number][guess_col] = 'X'
-        print_board(board)
+        battleship.remove((guess_row_number, guess_col))
         print "Hit!"
+        print_board(board)
+        if len(battleship) == 0:
+            print "You sunk my battleship!"
+            return
+        else:
+            get_guess(board, battleship)
     else:   
         if board[guess_row_number][guess_col] == 'X' or board[guess_row_number][guess_col] == 'O':
             print "You guessed that one already."
-            get_guess(board)
+            get_guess(board, battleship)
         else:
             print "Miss!"
             board[guess_row_number][guess_col] = 'O'
             print_board(board)
-            get_guess(board)
+            get_guess(board, battleship)
 
-get_guess(board)
+get_guess(board, battleship)
